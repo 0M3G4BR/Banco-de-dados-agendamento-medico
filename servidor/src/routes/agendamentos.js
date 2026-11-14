@@ -67,4 +67,25 @@ router.post('/', async (req, res) => {
     }
 })
 
-//router.delete('/:id', async (req, res) => {})
+router.delete('/:id', async (req, res) => {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ erro: 'ID inválido' });
+    }
+
+    try {
+        const [resultado] = await pool.execute(
+            'DELETE FROM agendamentos WHERE id = ?', [id]
+        );
+
+        if (resultado.affectedRows === 0) {
+            return res.status(404).json({ erro: 'Agendamento não encontrado'})
+        }
+    }catch (erro) {
+        console.erro(erro);
+        res.status(500).json({ erro: 'Erro ao remover agendamento'})
+    }
+});
+
+export default router;
