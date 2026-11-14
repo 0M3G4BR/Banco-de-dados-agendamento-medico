@@ -34,3 +34,37 @@ router.get('/', async (req,res) =>{
         exports.status(500).json({erro: 'Erro ao listar agendamentos'})
     }
 });
+
+router.post('/', async (req, res) => {
+    const { medico_id, paciente_nome, data_hora, observacao } = req.body ?? {};
+
+    if (!medico_id || !paciente_nome || !data_hora){
+        return res.status(400).json({
+        erro: 'Campos obrigatórios: medico_id, paciente_nome e data_hora'
+        })
+    }
+    try{
+        const [resultado] = await pool.execute(
+            `INSERT INTO agendamentos (medico_id, paciente_nome, data_hora, observacao)
+                VALUES (?, ?, ?, ?)`,
+                [medico_id, paciente_nome, data_hora, observacao || null]
+        );
+
+        res.status(201).json({
+            id: resultado.insertID,
+            medico_id, paciente_nome,data_hora,
+            observacao: observacao || null
+        })
+    }catch(erro){
+        if (erro.code == 'ER_NO_REFERENCED_ROW_2'){
+            return res.status(400).json({ erro:'Médico informado não existe'})
+        }
+        if (erro.code == 'ER_TRUNCATED_ERONG_VALUE'){
+            return res.status(400).json({ erro:'data_hora em formato inválido'});
+        }
+        console.error(erro);
+        res.status(500).json({ erro: 'erro ao criar agemdamento' });
+    }
+})
+
+//router.delete('/:id', async (req, res) => {})
