@@ -1,8 +1,8 @@
 Programas usados:
 
--MySQL Workbench
--XAMPP Control Panel
--VsCode
+- MySQL Workbench
+- XAMPP Control Panel
+- VsCode
 
 Comandos para iniciar a aplicação
 
