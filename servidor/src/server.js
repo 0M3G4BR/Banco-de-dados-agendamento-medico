@@ -2,9 +2,9 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 
-import { testarConexão } from './db.js'
+import { testarConexao } from './db.js'
 import medicosRouter from './routes/medicos.js'
-import agendamentosRouter from '.routes/agendamentos.js'
+import agendamentosRouter from './routes/agendamentos.js'
 
 const app = express();
 
@@ -17,7 +17,8 @@ app.use('/api/agendamentos', agendamentosRouter);
 const PORT = process.env.PORT || 3000;
 
 try{
-    await testarConexão();
+    await testarConexao();
+    console.log('Conectado ao MySQL')
     app.listen(PORT, ()=>{
         console.log(`API rodando em https://localhost:${PORT}`)
     })

@@ -8,12 +8,17 @@ router.get('/', async (req,res) =>{
         const {medico_id, data} = req.query;
 
         let sql = `
-            SELECT a.id, a.paciente_nome, a.data_hora
-            a. observacao, a.criado_em, m.id AS medico_id,
-            m.nome AS medico_nome, m.especialidade
-            FROM agendamentos a
-            INNER JOIN medicos m ON m.ido = a.medico.id
-            WHERE 1 = 1`;
+        SELECT a.id,
+            a.paciente_nome,
+            a.data_hora,
+            a. observacao,
+            a.criado_em,
+            m.id AS medico_id,
+            m.nome AS medico_nome,
+            m.especialidade
+        FROM agendamentos a
+        INNER JOIN medicos m ON m.id = a.medico_id
+        WHERE 1 = 1`;
         const params = [];
         
         if(medico_id){
@@ -30,8 +35,8 @@ router.get('/', async (req,res) =>{
         pool.execute(sql, params);
         res.json(linhas)
     } catch (erro){
-        console.erro(erro);
-        exports.status(500).json({erro: 'Erro ao listar agendamentos'})
+        console.error(erro);
+        res.status(500).json({erro: 'Erro ao listar agendamentos'})
     }
 });
 
@@ -68,22 +73,25 @@ router.post('/', async (req, res) => {
 })
 
 router.delete('/:id', async (req, res) => {
+    
+    try{
     const id = Number(req.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
+     if (!Number.isInteger(id) || id <= 0) {
         return res.status(400).json({ erro: 'ID inválido' });
     }
 
-    try {
+    
         const [resultado] = await pool.execute(
             'DELETE FROM agendamentos WHERE id = ?', [id]
         );
 
-        if (resultado.affectedRows === 0) {
-            return res.status(404).json({ erro: 'Agendamento não encontrado'})
-        }
-    }catch (erro) {
-        console.erro(erro);
+         if (resultado.affectedRows === 0) {
+      return res.status(404).json({ erro: 'Agendamento não encontrado' });
+    }
+
+    res.json({ mensagem: 'Agendamento cancelado', id });
+  } catch (erro) {
+        console.error(erro);
         res.status(500).json({ erro: 'Erro ao remover agendamento'})
     }
 });
